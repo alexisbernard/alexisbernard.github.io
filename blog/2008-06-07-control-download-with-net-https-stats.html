@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Control download with Net::HTTP::Stats</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="../css/min/style.css">
+  </head>
+  <body>
+    <section class="blog">
+      <article>
+        <h2>Control download with Net::HTTP::Stats</h2>
+        <span class="date">June 7, 2008, by <a href="/">Alexis Bernard </a></span>
+        <p>Download a file is a source of problems. Host can be down, bandwith can be too slow, file can be too big, download takes too much time &#8230; This is an important point for a program which download many files. Furthemore it&#8217;s often useful to notice users how much of a file is downloaded and when it will be finished.</p>
+<p>That&#8217;s why I wrote a little module named Net::HTTP::Stats. This module count the number of bytes read, and then set correctly some variables like rate, estimated left time, percent of bytes read and so on. I used this module for a web bot, which downloads many many web pages, and it&#8217;s working really well.</p>
+<p>The following code download Ruby and print the percent of download, the rate and the estimated remaining time.</p>
+<pre><code>require 'net/http'
+require 'net/http/stats'
+content = ''
+uri = URI.parse('http://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.6.tar.gz')
+response = Net::HTTP.get_response_with_stats(uri) do |resp, bytes|
+  content &lt;&lt; bytes
+  puts "#{resp.bytes_percent}% downloaded at #{(resp.bytes_rate / 1024).to_i} Ko/s, remaining #  {resp.left_time.to_i} seconds"
+end
+</code></pre>
+<p>This script will print something like:</p>
+<pre><code>13% downloaded at 59 Ko/s, remaining 65 seconds
+</code></pre>
+<p>The module Net::HTTP::Stats add the get_response_with_stats method. It works like get_response. However the block have a 2nd argument which contains bytes. It&#8217;s not possible to get bytes via response.read_body, because bytes have been already read to set the stats.</p>
+<p>From this work it&#8217;s easy to write rules:</p>
+<ul>
+<li>Minimum rate</li>
+<li>Maximum file size</li>
+<li>Maximum time</li>
+</ul>
+<p>That&#8217;s why I wrote a 2nd method called get_response_with_rules. Rules are stored in a hash. Like get_response_with_stats the block takes 2 same arguments.</p>
+<pre><code>rules = {
+  # Download is interrupted if spent time is greater (in sec).
+  :max_time =&gt; 5 * 60,
+  # Download is interrupted if estimated time is greater (in sec).
+  :max_left_time =&gt; 5 * 60,
+  # Download is interrupted if body is greater (in byte).
+  :max_size =&gt; 50 * 1024 * 1024,
+  # Wait some time before checking max_time and max_left_time (in sec).
+  # something between 5 and 20 seconds should be good.
+  :min_time =&gt; 15
+}
+content = ''
+uri = URI.parse('http://ftp.ruby-lang.org/pub/ruby/1.8/ruby-1.8.6.tar.gz')
+response = Net::HTTP.get_response_with_rules(uri, rules) do |resp, bytes|
+  content &lt;&lt; bytes
+end
+</code></pre>
+<p>To use Net::HTTP::Stats you have to copy the «&#160;lib&#160;» folder into your project or any location pointed by your $LOAD_PATH. Any feed back is welcome.</p>
+<p>Download Net::HTT::Stats.</p>
+      </article>
+    </section>
+  </body>
+</html>

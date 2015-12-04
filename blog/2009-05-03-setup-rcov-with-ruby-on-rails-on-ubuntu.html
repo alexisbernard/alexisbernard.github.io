@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Setup Rcov with Ruby on Rails on Ubuntu</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="../css/min/style.css">
+  </head>
+  <body>
+    <section class="blog">
+      <article>
+        <h2>Setup Rcov with Ruby on Rails on Ubuntu</h2>
+        <span class="date">May 3, 2009, by <a href="/">Alexis Bernard </a></span>
+        <p>Rrcov is a code coverage tool for Ruby. First of all we install it with Ruby gems.</p>
+<pre>sudo gem install rcov</pre>
+<p>Then we create a file lib/tasks/rcov.rake in your rails project.</p>
+<pre><code>require 'rcov/rcovtask'
+Rcov::RcovTask.new do |t|
+  t.test_files = FileList['test/unit/*.rb'] + FileList['test/functional/*.rb']
+  t.rcov_opts = ['--rails', '-x /var/lib', '--text-report', '--sort coverage']
+  t.output_dir = 'doc/coverage'
+  t.libs &lt;&lt; "test"
+  t.verbose = true
+end
+</code></pre>
+<p>You can change the options for your own usage. I like these options because worst covered files appeared on the top of the list. The HTML output is written in the folder doc/coverage. Then to run rcov you just enter.</p>
+<pre><code>rake rcov
+</code></pre>
+<p><strong>No implicit conversion from nil to integer</strong></p>
+<p>If you got the following error.</p>
+<pre><code>no implicit conversion from nil to integer (TypeError)
+</code></pre>
+<p>You should edit the file /usr/lib/ruby/1.8/rexml/formatters/pretty.rb and replace this line</p>
+<pre><code>place = string.rindex(' ', width) # Position in string with last ' '
+</code></pre>
+<p>by this one</p>
+<pre><code>place = string.rindex(' ', width) || width # Position in string with last ' '
+</code></pre>
+<p><strong>Stack level too depp</strong></p>
+<p>If you got the following error.</p>
+<pre><code>/usr/lib/ruby/1.8/rexml/formatters/pretty.rb:129:in `wrap': stack level too deep (SystemStackError)
+</code></pre>
+<p>You should edit the file /var/lib/gems/1.8/gems/rcov-0.8.1.2.0/lib/rcov/report.rb and replace the following line.</p>
+<pre><code>if RUBY_VERSION == "1.8.6" &amp;&amp; defined? REXML::Formatters::Transitive
+</code></pre>
+<p>by this one</p>
+<pre><code>if RUBY_VERSION == "1.8.7" &amp;&amp; defined? REXML::Formatters::Transitive
+</code></pre>
+      </article>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Tips to avoid RMagick memory leaks</title>
+    <meta name="description" content="">
+    <link rel="stylesheet" href="../css/min/style.css">
+  </head>
+  <body>
+    <section class="blog">
+      <article>
+        <h2>Tips to avoid RMagick memory leaks</h2>
+        <span class="date">November 27, 2014, by <a href="/">Alexis Bernard </a></span>
+        <p>
+          RMagick has a bad reputation because of memory leaks. I had memory leaks issue while working on
+          <a href="http://disco.io/">DISCO.IO</a> where Ruby processes kept bloating.
+          That issue was really annyoing since millions of pictures are resized.
+          Finally I succeed to fix my code. Now memory usage is stable. Here is how I did it.
+        </p>
+
+        <p>TL;DR for hurry people:</p>
+        <ul>
+          <li>Call Magick::Image#destroy! (ensure block is a damn good idea)</li>
+          <li>Use methods with exclamation mark as much as spossible</li>
+        </ul>
+
+        <p>Here is the code before improvements:</p>
+
+<code><pre>
+def resize_picture(data, size)
+  picture = Magick::Image.from_blob(data).first
+
+  if (min_size = [picture.rows, picture.columns].min) >= 360
+    picture = picture.crop(Magick::CenterGravity, min_size, min_size)
+  end
+
+  picture = picture.resize_to_fill(size, size) if picture.rows > size
+  result = normalize_picture(picture)
+  picture.destroy!
+  result
+end
+</pre></code>
+        <p>Here is the code after fixing memory leaks with changes in bold:</p>
+
+<code><pre>
+def resize_picture(data, size)
+  picture = Magick::Image.from_blob(data).first
+
+  if (min_size = [picture.rows, picture.columns].min) >= 360
+    picture.<strong>crop!</strong>(Magick::CenterGravity, min_size, min_size)
+  end
+
+  picture.<strong>resize_to_fill!</strong>(size, size) if picture.rows > size
+  normalize_picture(picture)
+<strong>ensure
+  picture &amp;&amp; picture.destroy!</strong>
+end
+</code></pre>
+
+        <p>
+          Calling the crop! instead of crop is a huge memory save, because the latter creates a copy the of the picture.
+          Like the Ruby convention of Enumerable, Array and Hash, RMagick provides the 2 versions for all methods.
+        </p>
+        <p>Finally destroy! is called from an ensure block to free memory in case of any error.</p>
+        <p>That is not really complicated and makes me really happy to stop Ruby processes from eating all the memory. I hope that will work for you too !</p>
+      </article>
+    </section>
+  </body>
+</html>

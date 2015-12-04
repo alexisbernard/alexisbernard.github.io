@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The end of ensecure authentications</title>
+    <link rel="stylesheet" href="../css/min/style.css">
+  </head>
+  <body>
+    <section class="blog">
+      <article>
+        <h2>The end of ensecure authentications</h2>
+        <span class="date">January 31, 2008, by <a href="/">Alexis Bernard </a></span>
+
+        <p>When I&#8217;m logging up on the web, on unsecure connections, I&#8217;m always thinking that anybody can discover my password. The attacker just needs to listen to the network using some Ethereal-like software.</p>
+<p>One solution is to use the HTTPS protocol instead of HTTP. Unfortunately too few web sites use it because it requires an SSL certificate.</p>
+<p>To get a certificate you have two possibilities. You can buy a certificate or generate one for yourself. Even if this isn&#8217;t really hard, too many web sites don&#8217;t encrypt passwords between the client and the server. We need a solution which doesn&#8217;t include HTTPS&#8217; constraints. Here is an answer which doesn&#8217;t need any configuration one the web server.</p>
+<p>First we have to admit that good web sites don&#8217;t store passwords in plain text in their database. Passwords have to be stored as a hash sum mixed with a unique seed to each user. It should look like this.</p>
+<pre><code>password_sum = md5(password + seed)
+</code></pre>
+<p>We only store password_sum in the database. Thus if an attacker gets a copy of the database he can&#8217;t guess the passwords.</p>
+<p>For each login attempt the web site will generate a temporary seed. This seed enables to fluctuate the bytes representing the passwords. This way, any sniffer attacks are countered.</p>
+<p>The client will compute the following formula before sending the connection request.</p>
+<p>encoded_password = md5(md5(password + seed) + temp_seed)<br />
+And the server will compute this one to check the connection attempt.</p>
+<p>encoded_password = md5(password_sum + temp_seed)<br />
+If both values are equal, then the user typed in the correct password.</p>
+<p>I&#8217;m over with the therory part. We will build our own secure authentication system with Ruby on Rails.</p>
+<p>The form will contain the following fields: login, password, seed, temp_seed and encoded_password.</p>
+<p>The main difficulty is to get the seed of the specified user. Indeed the seed is unique for each user. It&#8217;s not possible to provide it when the form is created, because we don&#8217;t know the user&#8217;s login. Fortunately Rails (actually prototype) has an AJAX helper method called observer_field. It enables to send a request when a field is edited. Thus when the login field is modified, a request is sent in the background to retrieve the user&#8217;s seed into the seed field. The form looks like this.</p>
+<pre><code>&lt;%= javascript_include_tag 'md5' %&gt;
+&lt;%= javascript_include_tag 'connection' %&gt;
+&lt;%= javascript_include_tag 'prototype' %&gt;
+&lt;p style="color: red"&gt;&lt;%= flash[:error] %&gt;&lt;/p&gt;
+&lt;%= start_form_tag 'check' %&gt;
+  Login: &lt;%= text_field_tag :login %&gt; &lt;br/&gt;
+  Password: &lt;%= password_field_tag :password %&gt; &lt;br/&gt;
+  Seed: &lt;span id='seed_container'&gt;&lt;%= text_field_tag :seed %&gt;&lt;/span&gt; &lt;br/&gt;
+  Temp seed: &lt;%= text_field_tag :tmp_seed, @tmp_seed %&gt; &lt;br/&gt;
+  Encoded password: &lt;%= text_field_tag :encoded_password %&gt; &lt;br/&gt;
+  &lt;%= submit_tag 'Connection', :onClick =&gt; "hash_password('password', 'seed',   'tmp_seed', 'encoded_password')" %&gt; &lt;br/&gt;
+  &lt;%= observe_field :login, :frequency =&gt; 0.5, :url =&gt; {:action =&gt; 'seed'}, :update =&gt; 'seed_container' %&gt;
+&lt;%= end_form_tag %&gt;
+</code></pre>
+<p>Finaly we need to compute the password sum before sending the form. As you can notice in the source code the function hash_password (in connection.js) is called when the user clicks on the submit button.</p>
+<pre><code>function hash_password(pwd_id, pwd_seed_id, tmp_seed_id, pwd_sum_id) {
+    var pwd = document.getElementById(pwd_id);
+    var pwd_seed = document.getElementById(pwd_seed_id);
+    var tmp_seed = document.getElementById(tmp_seed_id);
+    var pwd_sum = document.getElementById(pwd_sum_id);
+    // Compute md5(md5(password + seed) + temp_seed)
+    // And don't forget to blank the original password field
+    pwd_sum.value = md5_hex(md5_hex(pwd.value + pwd_seed.value) + tmp_seed.value);
+    pwd.value = '';
+}
+</code></pre>
+<p>This function is quite simple. The two last lines are the most important ones. The first computes the sum as explained before. And the last blanks the password field to not send it over the network. As you may notice I included an md5 file which isn&#8217;t mine and can be found here. You also can use sha-1 instead of md5.</p>
+<p>The connection attempt is checked in the &#8216;check&#8217; action of the controller connection.</p>
+<pre><code>def check
+  tmp_seed = session[:tmp_seed]
+  raise if tmp_seed.nil? or tmp_seed != params[:tmp_seed]
+  @session[:tmp_seed] = nil
+  usr = get_user(params[:login])
+  raise if usr.nil?
+  client_password = params[:encoded_password]
+  server_password = hash_sum(usr.password_sum + tmp_seed)
+  raise if client_password != server_password
+  flash[:notice] = "Connected as #{usr.login}"
+rescue =&gt; e
+  flash[:error] = 'Bad login'
+  redirect_to(:action =&gt; :open)
+end
+</code></pre>
+<p>I hope that this note will help you have your own secure authentication and/or made you realize the importance of having clear passwords over the internet.</p>
+      </article>
+    </section>
+  </body>
+</html>

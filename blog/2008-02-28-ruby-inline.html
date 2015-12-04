@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ruby Inline</title>
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="../css/min/style.css">
+  </head>
+  <body>
+    <section class="blog">
+      <article>
+        <h2>Ruby Inline</h2>
+        <span class="date">February 28, 2008, by <a href="/">Alexis Bernard </a></span>
+
+        <p>Sometimes applications need to be fast. Unfortunalty scripting languages like Ruby are slow. However rewriting an entire application isn&#8217;t the most efficient way. Furthemore the part that need to be faster isn&#8217;t really of an outstanding size in terms of code. That&#8217;s why Ruby inline is an excellent solution.</p>
+<p>The goal is to replace the slow Ruby code by C code. It could be 5 or 20 lines in most of cases. Thanks to Ruby Inline it&#8217;s possible to rewrite methods in C directly in the ruby source. The C code is compiled on the fly only once. In less than 10 lines I decrease execution time of 40% in the example of this article. The most impressive is that it took me 15 minutes to do it without knowing Ruby Inline before. I think Ruby Inline is a really good tool.</p>
+<p>For example we will try to optimise the class Hash32. This class computes the hash of a string by mixing characters by block of 4 bytes. The result is an integer of 32 bytes. The following sample code is extracted from file hash32.rb.</p>
+<pre><code>class Hash32
+  def compute(str)
+    i = 0
+    sum = 0
+    size = str.size
+    str = String.new(str)
+    missing = 4 - (size % 4)
+    str &lt;&lt; '_' * missing if missing != 4
+    while i &lt; size
+      sum ^= mix(str[i], str[i+1], str[i+2], str[i+3])
+      i += 4
+    end
+    sum
+  end
+
+  def mix(a, b, c, d)
+    (a &lt;&lt; 24) + (b &lt;&lt; 16) + (c &lt;&lt; 8) + d
+  end
+end
+</code></pre>
+<p>I decided to optimise only the method mix because it don&#8217;t required a lot of knowledge about Ruby C API. I decided to write the fast version in an other file, called hash32.c.rb, to be more elegant and useful.</p>
+<pre><code>class Hash32
+  require 'inline'
+  c_inline = &lt;&lt;__INLINE__
+VALUE mix(unsigned int a, unsigned int b, unsigned int c, unsigned int d)
+{
+  return UINT2NUM((a &lt;&lt; 24) + (b &lt;&lt; 16) + (c &lt;&lt; 8) + d);
+}
+__INLINE__
+  inline do |builder| builder.c(c_inline) end
+rescue LoadError =&gt; e
+end
+</code></pre>
+<p>First of all we have to load the inline library. Then we write the C code for the mix method. Ruby Inline translates most of basic types. However in this case we need the macro UINT2NUM. I advice you to read the chapter Extending Ruby of the programming Ruby book. You d&#8217;ont have to be a Ruby C API guru to optimize with Ruby Inline. But it&#8217;s better to have some basic knowledge about it.</p>
+<p>Ruby Inline is not included in the Ruby standard library. Moreover Ruby Inline requires a C compiler like gcc and Ruby headers to work. That&#8217;s why it may not work on all platforms. The best solution is to use the C version where Ruby Inline is available otherwise the slow version of mix. This job is done by the rescue LoadError if require &#8216;inline&#8217; failes.</p>
+<p>You can install Ruby Inline via gem.</p>
+<p>gem install RubyInline</p>
+<p>And don&#8217;t forget to install Ruby headers too. You can download the complete source code. There is a file named collisions.rb that tests the hash sum with about 90&#160;000 words. The script is executed in 7.2 seconds in pure Ruby and in 4.3 seconds with the inline version of mix.</p>
+<p>Wishing you nice optimisations with Ruby Inline.</p>
+      </article>
+    </section>
+  </body>
+</html>
