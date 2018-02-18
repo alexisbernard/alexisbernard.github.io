@@ -1,0 +1,13 @@
+body {
+  font-family: Georgia, Times, serif;
+  color: #46494C;
+}
+
+p { line-height: 32px; }
+
+a {
+  color: #46494C;
+  text-decoration: underline;
+}
+
+a:hover { color: #46494C; }
