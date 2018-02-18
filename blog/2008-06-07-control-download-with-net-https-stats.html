@@ -3,18 +3,16 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Control download with Net::HTTP::Stats</title>
     <meta name="description" content="">
-
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>Control download with Net::HTTP::Stats</h2>
-        <span class="date">June 7, 2008, by <a href="/">Alexis Bernard </a></span>
-        <p>Download a file is a source of problems. Host can be down, bandwith can be too slow, file can be too big, download takes too much time &#8230; This is an important point for a program which download many files. Furthemore it&#8217;s often useful to notice users how much of a file is downloaded and when it will be finished.</p>
+    <section class="container">
+      <h1>Control download with Net::HTTP::Stats</h1>
+      <p class="post-date">June 7, 2008</p>
+      <p>Download a file is a source of problems. Host can be down, bandwith can be too slow, file can be too big, download takes too much time &#8230; This is an important point for a program which download many files. Furthemore it&#8217;s often useful to notice users how much of a file is downloaded and when it will be finished.</p>
 <p>That&#8217;s why I wrote a little module named Net::HTTP::Stats. This module count the number of bytes read, and then set correctly some variables like rate, estimated left time, percent of bytes read and so on. I used this module for a web bot, which downloads many many web pages, and it&#8217;s working really well.</p>
 <p>The following code download Ruby and print the percent of download, the rate and the estimated remaining time.</p>
 <pre><code>require 'net/http'
@@ -56,7 +54,8 @@ end
 </code></pre>
 <p>To use Net::HTTP::Stats you have to copy the «&#160;lib&#160;» folder into your project or any location pointed by your $LOAD_PATH. Any feed back is welcome.</p>
 <p>Download Net::HTT::Stats.</p>
-      </article>
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>

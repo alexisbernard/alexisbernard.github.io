@@ -11,3 +11,13 @@ a {
 }
 
 a:hover { color: #46494C; }
+
+pre { border-color: #A0ACAD; }
+
+.about p {
+  font-size: 1.33em;
+  line-height: 42px;
+}
+
+.post-list { margin-left: 20px; }
+.post-date { color: #A0ACAD; }

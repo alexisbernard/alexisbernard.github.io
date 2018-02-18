@@ -6,43 +6,42 @@
 
     <title>Good naming for a beautiful code</title>
     <meta name="description" content="">
-
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>Good naming for a beautiful code</h2>
-        <span class="date">December 28, 2012, by <a href="/">Alexis Bernard </a></span>
-        <p>Naming variables, methods and classes well helps teammates to easily understand your code. Indeed when a code is perfectly named you feel like almost reading english. Thus, it&#8217;s not necessery to read the documentation or the code of a method to understand what it does. It saves a lot of time and makes developers happier. I am going to explain how I try to choose a good name when I am writing Ruby.</p>
-        <p>First I use a kind of grammar for naming variables, methods and classes. I use regular names for classes and variables. I start all my methods by a verb except when it&#8217;s an attribute accessor. When choosing a verb, I avoid to pick up set and get, because they are catch-all. Let&#8217;s take an example with a server instance providing data.</p>
-<pre>server.data        # Read an attribute?
+    <section class="container">
+      <h1>Good naming for a beautiful code</h1>
+      <p class="post-date">December 28, 2012</p>
+      <p>Naming variables, methods and classes well helps teammates to easily understand your code. Indeed when a code is perfectly named you feel like almost reading english. Thus, it&#8217;s not necessery to read the documentation or the code of a method to understand what it does. It saves a lot of time and makes developers happier. I am going to explain how I try to choose a good name when I am writing Ruby.</p>
+      <p>First I use a kind of grammar for naming variables, methods and classes. I use regular names for classes and variables. I start all my methods by a verb except when it&#8217;s an attribute accessor. When choosing a verb, I avoid to pick up set and get, because they are catch-all. Let&#8217;s take an example with a server instance providing data.</p>
+<pre><code>server.data        # Read an attribute?
 server.get_data    # Better but still bad
-server.fetch_data  # Good name, I understand it goes through the network
-</pre>
+server.fetch_data  # Good name, I understand it goes through the network</code></pre>
 <p>It&#8217;s pretty clear that the last example is the most explicit naming. Indeed, I understand it retrieves data from the network, so it is explicit that call could be slow. However don&#8217;t go too deep in detail. If the name expose all the internal behavior and algorithme, then you went too far. When calling a method, we are interested by its result, not how it has been implemented.</p>
-<p><pre>server.fetch_data_via_http # Callers usually doesn't care about internal behavior</pre></p>
+<p><pre><code>server.fetch_data_via_http # Callers usually doesn't care about internal behavior</code></pre></p>
 <p>It&#8217;s also important to be consistent. Let&#8217;s say you have a cart object and the payment process has two steps. First it initializes the payment, then it confirms.</p>
-<p><pre> # Not consistent, because the calling order is not obvious
+<p><pre><code># Not consistent, because the calling order is not obvious
 cart.authorize(...)
-cart.purchase(...)</pre></p>
-<p><pre> # Consistent naming, because it makes clear that those methods are linked
+cart.purchase(...)</code></pre></p>
+<p><pre><code># Consistent naming, because it makes clear that those methods are linked
 cart.prepare_checkout(...)
 cart.complete_checkout(...)
-</pre></p>
+</code></pre></p>
 <p>For variables I don&#8217;t prefix or suffix them with their type, because it generates noise. Most of the time names is connected to the variable type. I try to be accurate about the naming. If the code is dealing with a banned user I name it banned_user instead of just user.</p>
 <p>Arguments order must not be disregarded. I use to put the most important argument in first, because it is directly related to the verb used by the method.</p>
-<p><pre> # Which one makes more sens?
+<p><pre><code> # Which one makes more sens?
 email.send_to(headers, users)
 email.send_to(users, headers)
-</pre></p>
+</code></pre></p>
 <p>I try to avoid boolean parameters because they don&#8217;t have any sens when written litteraly.</p>
-<p><pre> # What means the last argument?
+<p><pre><code># What means the last argument?
 email.send_to(users, headers, true)
 email.send_to(users, headers, signature: true)
-</pre></p>
+</code></pre></p>
 <p>I hope those small tips have been interesting.</p>
-      </article>
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>

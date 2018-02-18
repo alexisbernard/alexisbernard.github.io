@@ -3,19 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Uncouple JavaScript and CSS</title>
     <meta name="description" content="">
-
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>Uncouple JavaScript and CSS</h2>
-        <span class="date">September 16, 2012, by <a href="/">Alexis Bernard </a></span>
-        <p>I used to tighten JavaScript to my CSS. My JavaScript was also too coupled to the backend of web application. Having too much coupled code is bad because refactoring becomes harder and costly. I am going to show you how I solved that problem.</p>
-<p>Here is a basic snippet where CSS and JavaScript are heavily coupled.</p>
+    <section class="container">
+      <h1>Uncouple JavaScript and CSS</h1>
+      <p class="post-date">September 16, 2012</p>
+      <p>I used to tighten JavaScript to my CSS. My JavaScript was also too coupled to the backend of web application. Having too much coupled code is bad because refactoring becomes harder and costly. I am going to show you how I solved that problem.</p>
+      <p>Here is a basic snippet where CSS and JavaScript are heavily coupled.</p>
 <pre><code>&lt;span class="delete"&gt;Delete&lt;/span&gt;
 
 $('.delete').click(deletePicture);
@@ -47,7 +45,8 @@ function deletePicture(event) {
 </code></pre>
 <p>Now, the JS is neither coupled to the CSS nor the backend side. The code is nicer, it breaks less often and is easier to refactor.</p>
 <p>I switched the span to an anchor for semantic purpose. That’s why I call preventDefault to tell to the browser to not open the link. If you prefer to have a span with a data-url attribute instead of the href, that’s perfectly fine too.</p>
-      </article>
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>

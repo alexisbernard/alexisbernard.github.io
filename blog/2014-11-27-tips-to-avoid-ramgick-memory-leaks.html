@@ -3,33 +3,31 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Tips to avoid RMagick memory leaks</title>
     <meta name="description" content="">
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>Tips to avoid RMagick memory leaks</h2>
-        <span class="date">November 27, 2014, by <a href="/">Alexis Bernard </a></span>
-        <p>
-          RMagick has a bad reputation because of memory leaks. I had memory leaks issue while working on
-          <a href="http://disco.io/">DISCO.IO</a> where Ruby processes kept bloating.
-          That issue was really annyoing since millions of pictures are resized.
-          Finally I succeed to fix my code. Now memory usage is stable. Here is how I did it.
-        </p>
+    <section class="container">
+      <h1>Tips to avoid RMagick memory leaks</h1>
+      <p class="post-date">November 27, 2014</p>
+      <p>
+        RMagick has a bad reputation because of memory leaks. I had memory leaks issue while working on
+        <a href="http://disco.io/">DISCO.IO</a> where Ruby processes kept bloating.
+        That issue was really annyoing since millions of pictures are resized.
+        Finally I succeed to fix my code. Now memory usage is stable. Here is how I did it.
+      </p>
 
-        <p>TL;DR for hurry people:</p>
-        <ul>
-          <li>Call Magick::Image#destroy! (ensure block is a damn good idea)</li>
-          <li>Use methods with exclamation mark as much as spossible</li>
-        </ul>
+      <p>TL;DR for hurry people:</p>
+      <ul>
+        <li>Call Magick::Image#destroy! (ensure block is a damn good idea)</li>
+        <li>Use methods with exclamation mark as much as spossible</li>
+      </ul>
 
-        <p>Here is the code before improvements:</p>
+      <p>Here is the code before improvements:</p>
 
-<code><pre>
-def resize_picture(data, size)
+<pre><code>def resize_picture(data, size)
   picture = Magick::Image.from_blob(data).first
 
   if (min_size = [picture.rows, picture.columns].min) >= 360
@@ -40,12 +38,11 @@ def resize_picture(data, size)
   result = normalize_picture(picture)
   picture.destroy!
   result
-end
-</pre></code>
-        <p>Here is the code after fixing memory leaks with changes in bold:</p>
+end</code></pre>
 
-<code><pre>
-def resize_picture(data, size)
+      <p>Here is the code after fixing memory leaks with changes in bold:</p>
+
+<pre><code>def resize_picture(data, size)
   picture = Magick::Image.from_blob(data).first
 
   if (min_size = [picture.rows, picture.columns].min) >= 360
@@ -56,16 +53,17 @@ def resize_picture(data, size)
   normalize_picture(picture)
 <strong>ensure
   picture &amp;&amp; picture.destroy!</strong>
-end
-</code></pre>
+end</pre></code>
 
-        <p>
-          Calling the crop! instead of crop is a huge memory save, because the latter creates a copy the of the picture.
-          Like the Ruby convention of Enumerable, Array and Hash, RMagick provides the 2 versions for all methods.
-        </p>
-        <p>Finally destroy! is called from an ensure block to free memory in case of any error.</p>
-        <p>That is not really complicated and makes me really happy to stop Ruby processes from eating all the memory. I hope that will work for you too !</p>
-      </article>
+      <p>
+        Calling the crop! instead of crop is a huge memory save, because the latter creates a copy the of the picture.
+        Like the Ruby convention of Enumerable, Array and Hash, RMagick provides the 2 versions for all methods.
+      </p>
+      <p>Finally destroy! is called from an ensure block to free memory in case of any error.</p>
+      <p>That is not really complicated and makes me really happy to stop Ruby processes from eating all the memory. I hope that will work for you too !</p>
+
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>

@@ -3,19 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Ruby Inline</title>
     <meta name="description" content="">
-
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>Ruby Inline</h2>
-        <span class="date">February 28, 2008, by <a href="/">Alexis Bernard </a></span>
+    <section class="container">
+      <h1>Ruby Inline</h1>
+      <p class="post-date">February 28, 2008</p>
 
-        <p>Sometimes applications need to be fast. Unfortunalty scripting languages like Ruby are slow. However rewriting an entire application isn&#8217;t the most efficient way. Furthemore the part that need to be faster isn&#8217;t really of an outstanding size in terms of code. That&#8217;s why Ruby inline is an excellent solution.</p>
+      <p>Sometimes applications need to be fast. Unfortunalty scripting languages like Ruby are slow. However rewriting an entire application isn&#8217;t the most efficient way. Furthemore the part that need to be faster isn&#8217;t really of an outstanding size in terms of code. That&#8217;s why Ruby inline is an excellent solution.</p>
 <p>The goal is to replace the slow Ruby code by C code. It could be 5 or 20 lines in most of cases. Thanks to Ruby Inline it&#8217;s possible to rewrite methods in C directly in the ruby source. The C code is compiled on the fly only once. In less than 10 lines I decrease execution time of 40% in the example of this article. The most impressive is that it took me 15 minutes to do it without knowing Ruby Inline before. I think Ruby Inline is a really good tool.</p>
 <p>For example we will try to optimise the class Hash32. This class computes the hash of a string by mixing characters by block of 4 bytes. The result is an integer of 32 bytes. The following sample code is extracted from file hash32.rb.</p>
 <pre><code>class Hash32
@@ -57,7 +55,8 @@ end
 <p>gem install RubyInline</p>
 <p>And don&#8217;t forget to install Ruby headers too. You can download the complete source code. There is a file named collisions.rb that tests the hash sum with about 90&#160;000 words. The script is executed in 7.2 seconds in pure Ruby and in 4.3 seconds with the inline version of mix.</p>
 <p>Wishing you nice optimisations with Ruby Inline.</p>
-      </article>
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>

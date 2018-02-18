@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The end of ensecure authentications</title>
-    <link rel="stylesheet" href="../css/min/style.css">
+    <link rel="stylesheet" href="../css/milligram.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <section class="blog">
-      <article>
-        <h2>The end of ensecure authentications</h2>
-        <span class="date">January 31, 2008, by <a href="/">Alexis Bernard </a></span>
+    <section class="container">
+      <h1>The end of ensecure authentications</h1>
+      <p class="post-date">January 31, 2008</p>
 
-        <p>When I&#8217;m logging up on the web, on unsecure connections, I&#8217;m always thinking that anybody can discover my password. The attacker just needs to listen to the network using some Ethereal-like software.</p>
+      <p>When I&#8217;m logging up on the web, on unsecure connections, I&#8217;m always thinking that anybody can discover my password. The attacker just needs to listen to the network using some Ethereal-like software.</p>
 <p>One solution is to use the HTTPS protocol instead of HTTP. Unfortunately too few web sites use it because it requires an SSL certificate.</p>
 <p>To get a certificate you have two possibilities. You can buy a certificate or generate one for yourself. Even if this isn&#8217;t really hard, too many web sites don&#8217;t encrypt passwords between the client and the server. We need a solution which doesn&#8217;t include HTTPS&#8217; constraints. Here is an answer which doesn&#8217;t need any configuration one the web server.</p>
 <p>First we have to admit that good web sites don&#8217;t store passwords in plain text in their database. Passwords have to be stored as a hash sum mixed with a unique seed to each user. It should look like this.</p>
@@ -72,7 +72,8 @@ rescue =&gt; e
 end
 </code></pre>
 <p>I hope that this note will help you have your own secure authentication and/or made you realize the importance of having clear passwords over the internet.</p>
-      </article>
+      <hr/>
+      <p><a href="/">Home</a></p>
     </section>
   </body>
 </html>
