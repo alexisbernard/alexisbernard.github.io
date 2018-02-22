@@ -3,6 +3,8 @@ body {
   color: #46494C;
 }
 
+.page { margin-top: 50px; }
+
 p { line-height: 32px; }
 
 a {
