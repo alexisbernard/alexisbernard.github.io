@@ -15,6 +15,7 @@ a {
 a:hover { color: #46494C; }
 
 pre { border-color: #A0ACAD; }
+pre code[class*="language-"] { font-family: monospace; }
 
 .about p {
   font-size: 1.33em;
