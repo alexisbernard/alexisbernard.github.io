@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <div class="page">
-    <section class="container">
+    <header>
       <h1>Control download with Net::HTTP::Stats</h1>
+    </header>
+    <main>
       <p class="post-date">June 7, 2008</p>
       <p>Download a file is a source of problems. Host can be down, bandwith can be too slow, file can be too big, download takes too much time &#8230; This is an important point for a program which download many files. Furthemore it&#8217;s often useful to notice users how much of a file is downloaded and when it will be finished.</p>
 <p>That&#8217;s why I wrote a little module named Net::HTTP::Stats. This module count the number of bytes read, and then set correctly some variables like rate, estimated left time, percent of bytes read and so on. I used this module for a web bot, which downloads many many web pages, and it&#8217;s working really well.</p>
@@ -57,7 +58,6 @@ end
 <p>Download Net::HTT::Stats.</p>
       <hr/>
       <p><a href="/">Home</a></p>
-    </section>
-    </div>
+    </main>
   </body>
 </html>

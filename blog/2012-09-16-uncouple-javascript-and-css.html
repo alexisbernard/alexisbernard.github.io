@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="../css/overwrite.css">
   </head>
   <body>
-    <div class="page">
-    <section class="container">
+    <header>
       <h1>Uncouple JavaScript and CSS</h1>
+    </header>
+    <main>
       <p class="post-date">September 16, 2012</p>
       <p>I used to tighten JavaScript to my CSS. My JavaScript was also too coupled to the backend of web application. Having too much coupled code is bad because refactoring becomes harder and costly. I am going to show you how I solved that problem.</p>
       <p>Here is a basic snippet where CSS and JavaScript are heavily coupled.</p>
@@ -48,7 +49,6 @@ function deletePicture(event) {
 <p>I switched the span to an anchor for semantic purpose. That’s why I call preventDefault to tell to the browser to not open the link. If you prefer to have a span with a data-url attribute instead of the href, that’s perfectly fine too.</p>
       <hr/>
       <p><a href="/">Home</a></p>
-    </section>
-    </div>
+    </main>
   </body>
 </html>
