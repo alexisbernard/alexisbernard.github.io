@@ -8,19 +8,37 @@
 
 header, main > * {
   max-width: 40rem;
-  margin: auto;
+  margin: 0 auto;
 }
 
 main figure,
 main section.carousel {
   max-width: 1280px;
   display: block;
-  margin: auto;
+  margin: 24px auto 0;
 }
 
 main pre,
 pre[class*="language-"] {
+  display: block;
   max-width: 1280px;
+  text-align: center;
+  background: transparent;
+  padding: 0;
+  margin: 24px auto;
+}
+
+main pre code,
+pre[class*="language-"] code {
   display: inline-block;
-  margin: 0 auto;
+  text-align: left;
+  background: rgba(var(--color-grey-50), 1);
+  padding: 24px;
+}
+
+@media screen and (min-width: 40rem) {
+  main pre code,
+  pre[class*="language-"] code {
+    min-width: 40rem;
+  }
 }
