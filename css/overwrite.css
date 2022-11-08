@@ -9,6 +9,8 @@ main figure {
   margin: 24px auto;
 }
 
+p { font-family: var(--font-serif); }
+
 main pre,
 pre[class*="language-"] {
   display: block;
