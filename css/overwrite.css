@@ -3,7 +3,8 @@ header, main > * {
   margin: 0 auto;
 }
 
-main figure {
+main figure,
+main iframe {
   max-width: 1280px;
   display: block;
   margin: 24px auto;
