@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <link>https://alexis.bernard.io</link>
+    <title>Alexis Bernard</title>
+    <description>Ruby on Rails developer</description>
+    <atom:link href="https://alexis.bernard.io/blog.rss" rel="self" type="application/rss+xml"/>
+
+    <item>
+      <title>Fast text search with PostgreSQL in a Rails project</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2021-04-22/fast-text-search-with-postgresql-in-a-rails-project.html</link>
+      <pubDate>Thu, 22 Apr 2021</pubDate>
+    </item>
+
+    <item>
+      <title>Tips to avoid RMagick memory leaks</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2014-11-27-tips-to-avoid-ramgick-memory-leaks.html</link>
+      <pubDate>Mon, 17 Nov 2014</pubDate>
+    </item>
+
+    <item>
+      <title>Good naming for a beautiful code</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2012-12-28-good-naming-for-beautiful-code.html</link>
+      <pubDate>Fri, 28 Dec 2012</pubDate>
+    </item>
+
+    <item>
+      <title>Uncouple JavaScript and CSS</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2012-09-16-uncouple-javascript-and-css.html</link>
+      <pubDate>Sat, 16 Sep 2012</pubDate>
+    </item>
+  </channel>
+</rss>
