@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eloquent code needs no comment</title>
+    <meta name="description" content="Optimise the PostgreSQL text search step by step by synchronizing a text vector column and adding a GIN index.">
+    <link rel="alternate" type="application/rss+xml" href="blog.rss" title="Alexis Bernard">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css">
+    <link rel="stylesheet" href="../css/ariato.css">
+    <link rel="stylesheet" href="../css/overwrite.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-sql.min.js"></script>
+  </head>
+  <body>
+    <main>
+    <article>
+      <h2>Eloquent code needs no comment</h2>
+      <p>
+        <time datetime="2021-07-22">August 11, 2023</time>
+      </p>
+
+      <p>Yesterday, I was reviewing the following code :</p>
+
+      <pre><code code class="language-ruby">
+class Invoice::ResellerJob < ApplicationJob
+  def perform
+    # Do nothing if we are not the first of the month
+    return unless Date.today.day == 1
+
+    # Generate monthly invoices
+    User.billed_monthly.each do |user|
+      # ...
+    end
+
+    # Do nothing if we are not on the first day of the year
+    return unless Date.today.month == 1
+
+    # Generate yearly invoices
+    User.billed_yearly.each do |user|
+      # ...
+    end
+  end
+end
+</code></pre>
+
+    <p>
+      Comments are often a tell that the code could be more explicit.
+      Every time I write a comment, I refactor my code to be understandable without it.
+      Furthermore, it requires to read all the lines of code to understand what this class does.
+      Here is a version that should be more eloquent:
+    </p>
+
+    <pre><code code class="language-ruby">
+class Invoice::ResellerJob < ApplicationJob
+  def perform
+    bill_monthly
+    bill_yearly
+  end
+
+  def bill_monthly
+    return if Date.today.day != 1
+    User.billed_monthly.each do |user|
+      # ...
+    end
+  end
+
+  def bill_yearly
+    return if Date.today.month != 1 || Date.today.day != 1
+    User.billed_yearly.each do |user|
+      # ...
+    end
+  end
+end
+</code></pre>
+
+    <p>
+      Reading the 2nd version is quicker because you only have to scan the method names to understand what it does.
+      Moreover, the return conditions are evident thanks to the method names above.
+
+      Write the code the way you would like to read it in the future ;-)
+    </p>
+
+    <p>
+      If you like this article, you might also like my <a href="https://www.rorvswild.com/">Ruby on Rails monitoring service</a>.
+    </p>
+
+      <hr/>
+      <p><a href="..">Home</a></p>
+    </article>
+    </main>
+  </body>
+</html>

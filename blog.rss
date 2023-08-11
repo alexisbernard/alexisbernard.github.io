@@ -7,6 +7,13 @@
     <atom:link href="https://alexis.bernard.io/blog.rss" rel="self" type="application/rss+xml"/>
 
     <item>
+      <title>Eloquent code needs no comment</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2023-08-11-eloquent-code-needs-no-comment.html</link>
+      <pubDate>Fri, 11 Aug 2023</pubDate>
+    </item>
+
+    <item>
       <title>Fast text search with PostgreSQL in a Rails project</title>
       <description></description>
       <link>https://alexis.bernard.io/blog/2021-04-22/fast-text-search-with-postgresql-in-a-rails-project.html</link>
