@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optimisation is often doing fewer things</title>
+    <meta name="description" content="Because no code is faster than no code.">
+    <link rel="alternate" type="application/rss+xml" href="blog.rss" title="Alexis Bernard">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism.min.css">
+    <link rel="stylesheet" href="../../css/ariato.css">
+    <link rel="stylesheet" href="../../css/overwrite.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-ruby.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/components/prism-sql.min.js"></script>
+  </head>
+  <body>
+    <main>
+    <article>
+      <h2>Optimisation is often doing fewer things</h2>
+      <p>
+        <time datetime="2022-09-22">September 22, 2023</time>
+      </p>
+
+      <p>
+        We recently migrated <a href="https://www.letemps.ch">Le Temps</a>, the most famous media in the French-speaking part of Switzerland, to Ruby on Rails. Yay!
+      </p>
+
+      <p>
+        Among an infinite list of tasks, we had a very low-priority issue to create <a href="https://www.letemps.ch/archive">archive pages</a>.
+        They list all articles ever written, ordered per month.
+        Their single purpose is to make it easy for search engines to index the website.
+        No human is supposed to visit archives, only robots. And bots never complain, so who cares?
+        Not us. We were so busy with other more important matters.
+      </p>
+
+      <p>
+        But as it usually happens when we don't care enough, we pay for it later.
+        It didn't take too long.
+      </p>
+
+      <p>
+        As it turns out, some robots scan those archive pages every few hours at a rate between 100 and 300 requests per minute.
+        It's not that much. But when those response times are between 10 and 60 seconds, it's way too much.
+        The search engine might causes a denial of service, and no human could access during the indexing.
+        But humans do complain.
+      </p>
+
+      <h3>Finding the bottleneck</h3>
+
+      <p>
+        Let's have a look at the code causing the troubles.
+        The controller is super simple, and the view is just a loop printing a link to each article.
+      </p>
+
+      <pre><code code class="language-ruby">class ArchivesController < ApplicationController
+  def show
+    @articles = Article::published_between(start_of_month, end_of_month)
+  end
+end
+</code></pre>
+
+      <p>
+        So, where is the bottleneck?
+        That's easy to find since we use <a href="https://www.rorvswild.com">RorVsWild</a>, our APM tool for Rails.
+        We were lucky to know what was happening before too many people noticed.
+      </p>
+
+      <figure>
+        <img src="rorvswild-profiler.png"/>
+        <figcaption></figcaption>
+      </figure>
+
+      <p>
+        We can see that roughly every two hours, there are some traffic spikes, and in between, less than a request per minute.
+        Half the time occurs in the view where the SQL request is triggered to instantiate thousands of ActiveRecord instances.
+        The other half occurs in an N+1 query problem where we retrieve a category or a series episode for every article, as their URLs depend on them.
+      </p>
+
+      <p>
+        What we have to do then is straightforward:
+        <ul>
+          <li>To avoid instantiating thousands of ActiveRecord objects</li>
+          <li>To avoid N+1 queries</li>
+        </ul>
+      </p>
+
+      <h3>Skipping ActiveRecord instances</h3>
+
+      <p>
+        ActiveRecord instances are convenient. They can be slow because they are doing many things.
+        In this particular case, we don't need much of its features.
+        So, the idea is to load only the data we need into PORO (Plain Old Ruby Object) and implement a few methods to generate proper URLs for articles.
+      </p>
+
+      <pre><code code class="language-ruby">class Article::Archive
+  attr_reader :id, :title, :path, :category_id, :series_id
+
+  def self.published_between(from_date, to_date)
+    select = <<-SQL
+      id,
+      title,
+      path,
+      -- An article has and belongs to many categories
+      (SELECT category_id FROM categorizations WHERE article_id = articles.id ORDER BY position LIMIT 1)
+    SQL
+    rows = Article.published_between(from_date, to_date).pluck(Arel.sql(select))
+    rows.map { |row| new(*row) }
+  end
+
+  def initialize(id, title, path, category_id)
+    @id = id
+    @title = title
+    @path = path
+    @category_id = category_id
+  end
+
+  def category
+    Category.find(category_id)  # We still have the N+1 query issue here
+  end
+
+  def to_param
+    path  # to_param is called by URL helpers
+  end
+end
+</code></pre>
+
+      <p>
+        We are using <code>pluck</code> to return raw results from the database.
+        Thus, it's much faster than instanciating Article instances as it only initializes four instance variables.
+      </p>
+
+      <p>
+        Moreover, with the subquery, we are already retrieving the category ID of an article.
+        We have to do it through a subquery because an article has and belongs to many categories.
+        The <code>category</code> method is needed to prefix the URL path with the category name.
+        Finally, we implement <code>to_param</code> to work with URL helpers.
+      </p>
+
+      <h3>Avoiding N+1 queries</h3>
+
+      <p>
+        We still have the N+1 query problem where a query is triggered to retrieve the category of each article.
+        The typical way to solve this issue is to use <code>Article.includes(:categories)</code> to fetch all categories in one query.
+        However, we can't access it since we no longer manipulate an ActiveRecord instance but our own <code>Article::Archive</code> object.
+        Moreover, there are less than 100 categories for thousands of articles.
+        That means <code>includes</code> would have instantiated many duplicated categories, which is suboptimal.
+        So, the idea is to load all categories into a hash and use it as a cache.
+        The code above introduces the <code>cache_categories</code> method.
+      </p>
+
+      <pre><code code class="language-ruby">class Article::Archive
+  attr_reader :id, :title, :path, :category_id, :series_id
+
+  def self.published_between(from_date, to_date)
+    cache_categories # Load upfront all categories
+    select = <<-SQL
+      id,
+      title,
+      path,
+      -- An article has and belongs to many categories
+      (SELECT category_id FROM categorizations WHERE article_id = articles.id ORDER BY position LIMIT 1)
+    SQL
+    rows = Article.published_between(from_date, to_date).pluck(Arel.sql(select))
+    rows.map { |row| new(*row) }
+  end
+
+  def self.cache_categories
+    @@categories = Category.all.reduce({}) { |h, c| h.update(c.id => c) }
+  end
+
+  def initialize(id, title, path, category_id)
+    @id = id
+    @title = title
+    @path = path
+    @category_id = category_id
+  end
+
+  def category
+    @@categories[category_id] # N+1 query solved !
+  end
+
+  def to_param
+    path
+  end
+end
+</code></pre>
+
+      <h3>Conclusion</h3>
+
+      <p>
+        After deploying we can enjoy watching the response time decreasing.
+      </p>
+
+      <figure>
+          <img src="response-time-chart.png"/>
+        <figcaption></figcaption>
+      </figure>
+
+      <p>
+        As the title said, doing less is always faster.
+        The optimisation was pretty simple.
+        It even took me more time to write this article than coding the optimisation.
+      </p>
+
+      <p>
+        Another possibility would have been to cache the views.
+        However it would not have solved the problem for the current month where articles are published throughout the day.
+        Moreover caching makes more sens for the most frequently viewed pages.
+      </p>
+
+      <p>
+        If you like this article, you might also like my <a href="https://www.rorvswild.com/">Ruby on Rails monitoring service</a>.
+      </p>
+
+      <hr/>
+      <p><a href="../..">Home</a></p>
+    </article>
+    </main>
+  </body>
+</html>
