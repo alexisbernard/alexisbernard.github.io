@@ -42,8 +42,7 @@
       <p>
         As it turns out, some robots scan those archive pages every few hours at a rate between 100 and 300 requests per minute.
         It's not that much. But when those response times are between 10 and 60 seconds, it's way too much.
-        The search engine might causes a denial of service, and no human could access during the indexing.
-        But humans do complain.
+        The search engine might cause a denial of service, and no human could access during the indexing, and humans do complain.
       </p>
 
       <h3>Finding the bottleneck</h3>
@@ -204,9 +203,7 @@ end
       </p>
 
       <p>
-        Another possibility would have been to cache the views.
-        However it would not have solved the problem for the current month, with frequent new articles.
-        Moreover caching makes more sens for the most frequently viewed pages.
+        Next step would be to cache theses pages, because fetching thousands of records it still a lot of work.
       </p>
 
       <p>
