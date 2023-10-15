@@ -7,6 +7,13 @@
     <atom:link href="https://alexis.bernard.io/blog.rss" rel="self" type="application/rss+xml"/>
 
     <item>
+      <title>Background job queues and priorities may be the wrong path</title>
+      <description></description>
+      <link>https://alexis.bernard.io/blog/2023-10-15-background-job-queues-and-priorities-may-be-the-wrong-path.html</link>
+      <pubDate>Sat, 15 Oct 2023</pubDate>
+    </item>
+
+    <item>
       <title>Optimisation is often doing fewer things</title>
       <description></description>
       <link>https://alexis.bernard.io/blog/2023-09-22/optimisation-is-often-doing-fewer-things.html</link>
