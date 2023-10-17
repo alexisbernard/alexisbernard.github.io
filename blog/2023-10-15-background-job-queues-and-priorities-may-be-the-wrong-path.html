@@ -88,6 +88,38 @@
         Viva latency SLO!
       </p>
 
+      <h2 id="post-scriptum">Post-scriptum</h2>
+
+      <p>
+        The article received interesting comments, especially from <a href="https://news.ycombinator.com/item?id=37890453">Hacker News</a>.
+        Thanks to all commenters for sharing their experiences and constructive opinions.
+        It shows that this post is incomplete and far from being perfect.
+        I will try improve it for futur readers by talking about overload situation and jobs not using the same resources.
+      </p>
+
+      <p>
+        In an overload situation, the choosen strategy (priority or latency) determines which jobs to delay.
+        With a priority system the low priority jobs will be all delayed.
+        Nevertheless, it does not guarantee that all high priority jobs won't be late.
+        For a latency strategy, the delay will be shared among all jobs.
+      </p>
+
+      <p>
+        All jobs are not using the same resources.
+        Somme are waiting for IOs, others are CPU intensive.
+        It's not the best way to mix these different kinds of jobs in the same queue.
+        For example, for IOs jobs it's better to have many threads.
+        However for CPU jobs, a thread per process should be enough most of the time.
+        That means whatever the strategy choosen, it's wrong to mix CPU and IO jobs in the same queue.
+      </p>
+
+      <p>
+        Finally, it's even possible to mix queues, priorities and latency.
+        For sure that sounds perfect in theory, however it becomes more complex.
+        As always it's a trade-off.
+        We need the simplest solution that is good enough.
+      </p>
+
       <hr/>
       <p><a href="..">Home</a></p>
     </article>
