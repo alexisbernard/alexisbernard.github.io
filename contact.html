@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alexis Bernard - Contact</title>
+    <link rel="stylesheet" href="css/ariato.css">
+    <link rel="stylesheet" href="css/overwrite.css">
+    <link rel="alternate" type="application/rss+xml" href="blog.rss" title="Alexis Bernard">
+  </head>
+  <body>
+    <header><h1>Alexis Bernard</h1></header>
+    <main>
+      <article>
+        <header>
+          <h2>Contact me via this form</h2>
+        </header>
+
+        <form accept-charset="UTF-8" method="post">
+          <script src="https://nicetou.ch/forms/alex.js"></script>
+
+          <label for="sender">Your Email</label>
+          <input type="email" id="sender" name="sender" required />
+
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" name="subject" minlength="6" required />
+
+          <label for="body">Message</label>
+          <textarea id="body" name="body" cols="60" rows="5" required></textarea>
+
+          <input type="hidden" name="return_url" value="https://alexis.bernard.io/sent.html" />
+          <input type="submit" name="commit" value="Send Message" />
+        </form>
+
+        <p>
+          This is my side project <a href="https://nicetou.ch">NiceTou.ch</a>:
+          a contact form, kind with 😇 humans, awful with 🤖 bots.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>
